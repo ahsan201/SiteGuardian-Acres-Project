@@ -1,0 +1,106 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+@font-face {
+  font-family: "WorkSans";
+  src: url("/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+:root {
+  /* colors face*/
+  --cf-Primary: #8b5dff;
+  --cf-Secondary: #c5d3e8;
+  --cf-Dark: #0e0e2c;
+  --cf-White: #ffffff;
+  --cf-Background: #f7faff;
+  --cf-Gray: #bdbdbd;
+  --cf-Success: #31d0aa;
+  --cf-Manager-Label: #ffd1f2;
+  --cf-Location-Label: #d1daff;
+}
+
+/* utility class  */
+body {
+  width: 100%;
+  height: 100vh;
+  font-family: "WorkSans";
+}
+h1 {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 4rem;
+  line-height: 4.7rem;
+}
+h2 {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 2.5rem;
+  line-height: 2.875rem;
+}
+h3 {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+.subtitle {
+  font-family: "WorkSans";
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+.body-regular,
+form label {
+  font-family: "WorkSans";
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 140%;
+}
+.body-bold {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 140%;
+}
+button {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.1rem;
+  letter-spacing: 4%;
+  text-transform: uppercase;
+  /* style  */
+  padding: 1rem 2rem;
+  border: none;
+  color: var(--cf-White);
+  background-color: var(--cf-Primary);
+  border-radius: 1rem;
+}
+.link-text {
+  font-family: "WorkSans";
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.1rem;
+  color: var(--cf-Primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.subtitle-light {
+  font-family: "WorkSans";
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 140%;
+}
+.label {
+  font-family: "WorkSans";
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.1rem;
+}
+.drop-shadow1 {
+  /* Drop Shadow 1 */
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
