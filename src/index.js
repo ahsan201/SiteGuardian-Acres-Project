@@ -1,7 +1,9 @@
+import { signupLogin } from "./signupLogin.js";
+import { navBar } from "./navBar.js";
 import {
+  body,
   signupForm,
   createAccountBTN,
-  adminKey,
   signupLoginVisibility,
   switchViewLogin,
   switchViewSignup,
@@ -13,6 +15,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
@@ -34,7 +37,7 @@ const auth = getAuth(app);
 
 // signup/login visibility toggle starts ----------------------------
 // Set initial form visibility (show signup or login by default)
-signupLoginVisibility(false); // Set to true to show signup form initially, false to show login
+signupLoginVisibility(true); // Set to false to show signup form initially, true to show login
 
 // Event listener for switching to the signup view
 switchViewSignup.addEventListener("click", () => {
@@ -57,9 +60,6 @@ createAccountBTN.addEventListener("click", async (e) => {
   const signupPassword = signupForm["signupPassword"].value.trim();
   const signupReWritePassword =
     signupForm["signupReWritePassword"].value.trim();
-  const signupAdminKey = signupForm["signupAdminKey"].value
-    .trim()
-    .toLowerCase();
   const signupUserType = signupForm["signupUserType"].value.trim();
 
   // Basic validation
@@ -68,7 +68,6 @@ createAccountBTN.addEventListener("click", async (e) => {
     !signupFullName ||
     !signupPassword ||
     !signupReWritePassword ||
-    !signupAdminKey ||
     !signupUserType
   ) {
     alert("All fields are required.");
@@ -77,12 +76,6 @@ createAccountBTN.addEventListener("click", async (e) => {
 
   if (signupPassword !== signupReWritePassword) {
     alert("Passwords do not match!");
-    return;
-  }
-
-  // Validate the admin key
-  if (signupAdminKey !== adminKey) {
-    alert("Invalid admin key");
     return;
   }
 
@@ -100,19 +93,21 @@ createAccountBTN.addEventListener("click", async (e) => {
       fullName: signupFullName,
       email: signupEmail,
       userType: signupUserType,
-      adminKey: adminKey,
     });
 
     alert("Account created successfully!");
-
     signupForm.reset();
   } catch (error) {
     console.error("Error signing up:", error);
-    alert(`Sign-up failed: ${error.message}`);
+    if (error.code === "auth/email-already-in-use") {
+      alert("This email is already registered. Please use a different email.");
+    } else {
+      alert(`Sign-up failed: ${error.message}`);
+    }
   }
 });
-
 // Sign up users section ends --------------------------------------------
+
 // Function to retrieve user data by UID starts -------------------------
 async function getUserData(uid) {
   const userDocRef = doc(db, "users", uid);
@@ -130,18 +125,41 @@ async function getUserData(uid) {
   }
 }
 // Function to retrieve user data by UID ends -------------------------
-// Loged In user starts ---------------------------------------------
+
+// Logged-in user state handling starts ---------------------------------------------
 onAuthStateChanged(auth, (user) => {
+  console.log("user logged in");
   if (user) {
-    // User is logged in, fetch their data
+    navBar(body);
+
+    // Fetch and log user data
     getUserData(user.uid).then((userData) => {
       if (userData) {
         console.log("Retrieved user data:", userData);
+        // Use user data (e.g., display in nav bar or main UI)
       }
     });
   } else {
-    // No user is logged in
     console.log("No user is logged in.");
+    signupLoginVisibility(true); // Show login/signup forms when no user is logged in
   }
 });
-// Loged In user ends---------------------------------------------
+// Logged-in user state handling ends ---------------------------------------------
+
+// log Out handle Starts ---------------------------------------------
+document.body.addEventListener("click", (event) => {
+  if (event.target.classList.contains("logoutBTN")) {
+    handleLogout();
+  }
+});
+function handleLogout() {
+  signOut(auth)
+    .then(() => {
+      signupLogin(body);
+    })
+    .catch((error) => {
+      console.error("Error logging out:", error);
+    });
+}
+
+// log Out handle ends ---------------------------------------------
