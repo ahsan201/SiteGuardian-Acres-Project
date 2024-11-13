@@ -1,5 +1,5 @@
 import { signupLogin } from "./signupLogin.js";
-import { navBar } from "./navBar.js";
+import { dashboard } from "./dashboard.js";
 import {
   body,
   signupForm,
@@ -9,17 +9,19 @@ import {
   switchViewSignup,
   signupFormContainer,
   loginFormContainer,
-} from "./ui.js"; // Import only necessary constants
+  loginForm,
+} from "./ui.js";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
-// Configuring Firebase Start ------------------------------------
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCijYSPyR0v0cnj-PAGeqL8KQrQhQpkFKk",
   authDomain: "siteguardian-c569e.firebaseapp.com",
@@ -33,28 +35,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-// Configuring Firebase End ------------------------------------
 
-// signup/login visibility toggle starts ----------------------------
-// Set initial form visibility (show signup or login by default)
-signupLoginVisibility(true); // Set to false to show signup form initially, true to show login
+// signup/login visibility toggle starts
+signupLoginVisibility(true); // Show login by default
 
-// Event listener for switching to the signup view
 switchViewSignup.addEventListener("click", () => {
-  signupLoginVisibility(true);
+  signupLoginVisibility(false); // Show signup form
 });
 
-// Event listener for switching to the login view
 switchViewLogin.addEventListener("click", () => {
-  signupLoginVisibility(false);
+  signupLoginVisibility(true); // Show login form
 });
-// signup/login visibility toggle ends ----------------------------
 
-// Sign up users section starts --------------------------------------------
-createAccountBTN.addEventListener("click", async (e) => {
+// Signup Form Submission
+signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  // Dynamically retrieve form values on each click
   const signupEmail = signupForm["signupEmail"].value.trim();
   const signupFullName = signupForm["signupFullNameInput"].value.trim();
   const signupPassword = signupForm["signupPassword"].value.trim();
@@ -62,7 +57,6 @@ createAccountBTN.addEventListener("click", async (e) => {
     signupForm["signupReWritePassword"].value.trim();
   const signupUserType = signupForm["signupUserType"].value.trim();
 
-  // Basic validation
   if (
     !signupEmail ||
     !signupFullName ||
@@ -80,7 +74,6 @@ createAccountBTN.addEventListener("click", async (e) => {
   }
 
   try {
-    // Create user in Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       signupEmail,
@@ -88,78 +81,79 @@ createAccountBTN.addEventListener("click", async (e) => {
     );
     const user = userCredential.user;
 
-    // Save additional user data in Firestore
     await setDoc(doc(db, "users", user.uid), {
       fullName: signupFullName,
       email: signupEmail,
       userType: signupUserType,
     });
 
-    alert("Account created successfully!");
     signupForm.reset();
   } catch (error) {
     console.error("Error signing up:", error);
-    if (error.code === "auth/email-already-in-use") {
-      alert("This email is already registered. Please use a different email.");
-    } else {
-      alert(`Sign-up failed: ${error.message}`);
-    }
+    alert(`Sign-up failed: ${error.message}`);
   }
 });
-// Sign up users section ends --------------------------------------------
 
-// Function to retrieve user data by UID starts -------------------------
+// Retrieve User Data by UID
 async function getUserData(uid) {
   const userDocRef = doc(db, "users", uid);
   try {
     const userDoc = await getDoc(userDocRef);
-    if (userDoc.exists()) {
-      console.log("User data:", userDoc.data());
-      return userDoc.data(); // Return the user data
-    } else {
-      console.log("No such document found for the UID.");
-      return null;
-    }
+    return userDoc.exists() ? userDoc.data() : null;
   } catch (error) {
     console.error("Error fetching user data:", error);
+    return null;
   }
 }
-// Function to retrieve user data by UID ends -------------------------
 
-// Logged-in user state handling starts ---------------------------------------------
+// Login Form Submission
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = loginForm["loginEmail"].value.trim();
+  const password = loginForm["loginPassword"].value.trim();
+
+  if (!email || !password) {
+    alert("Please enter both email and password.");
+    return;
+  }
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log("User logged in:", user);
+    })
+    .catch((error) => {
+      console.error("Error logging in:", error);
+      alert(`Login failed: ${error.message}`);
+    });
+});
+
+// Handle Auth State Changes
 onAuthStateChanged(auth, (user) => {
-  console.log("user logged in");
   if (user) {
-    navBar(body);
+    console.log("User logged in");
 
-    // Fetch and log user data
     getUserData(user.uid).then((userData) => {
       if (userData) {
-        console.log("Retrieved user data:", userData);
-        // Use user data (e.g., display in nav bar or main UI)
+        console.log("Retrieved user data:", userData.fullName);
+        dashboard(body, userData.fullName.split(" ")[0]);
       }
     });
   } else {
     console.log("No user is logged in.");
-    signupLoginVisibility(true); // Show login/signup forms when no user is logged in
   }
 });
-// Logged-in user state handling ends ---------------------------------------------
 
-// log Out handle Starts ---------------------------------------------
+// Logout Handling
 document.body.addEventListener("click", (event) => {
   if (event.target.classList.contains("logoutBTN")) {
-    handleLogout();
+    signOut(auth)
+      .then(() => {
+        console.log("User logged out.");
+        signupLogin(body);
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+      });
   }
 });
-function handleLogout() {
-  signOut(auth)
-    .then(() => {
-      signupLogin(body);
-    })
-    .catch((error) => {
-      console.error("Error logging out:", error);
-    });
-}
-
-// log Out handle ends ---------------------------------------------

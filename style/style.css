@@ -93,6 +93,7 @@ button {
   font-weight: 300;
   font-size: 1rem;
   line-height: 140%;
+  color: var(--cf-Gray);
 }
 .label {
   font-family: "WorkSans";
@@ -104,9 +105,9 @@ button {
   /* Drop Shadow 1 */
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
-.login-form {
+/* .login-form {
   display: none;
-}
+} */
 
 ul {
   list-style-type: none;
@@ -169,3 +170,11 @@ nav {
 }
 
 /* nav bar ends ------------------------------------ */
+/* dashboard content starts --------------------------------- */
+.main {
+  margin-top: 2.5rem;
+}
+.main .user-name {
+  color: var(--cf-Primary);
+}
+/* dashboard content ends --------------------------------- */
