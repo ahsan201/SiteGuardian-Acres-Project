@@ -105,10 +105,12 @@ button {
   /* Drop Shadow 1 */
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
-/* .login-form {
+/* .signup-form {
   display: none;
 } */
-
+body {
+  background-color: var(--cf-Background);
+}
 ul {
   list-style-type: none;
   padding-left: 0;
@@ -129,6 +131,10 @@ img {
   height: 100%; */
   object-fit: cover;
   object-position: center;
+}
+
+label {
+  display: block;
 }
 /* nav bar starts ------------------------------------ */
 nav {
@@ -178,3 +184,71 @@ nav {
   color: var(--cf-Primary);
 }
 /* dashboard content ends --------------------------------- */
+
+/* signup/login style starts ----------------------- */
+.bg {
+  background-color: var(--cf-Background);
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+}
+.login-box {
+  background-color: var(--cf-White);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+.login-image {
+  width: 50%;
+  max-height: 800px;
+  object-fit: cover;
+  object-position: center;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+.logo-Title {
+  display: flex;
+  align-items: center;
+}
+.login-form,
+.signup-form {
+  padding: 2rem;
+  margin: auto;
+}
+
+#loginForm,
+#signupForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#loginForm button,
+#signupForm button {
+  margin-top: 2rem;
+}
+
+form input,
+select {
+  border: 1px solid var(--cf-Gray);
+  font-size: 1.2rem;
+  padding: 0.8rem 0.8rem;
+  border-radius: 0.5rem;
+}
+/* signup/login style ends ----------------------- */
+/* Assign user style starts ------------------------ */
+.assignUserBox {
+  margin-top: 4rem;
+}
+.assignUserBox form {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  gap: 0.5rem;
+}
+.assignUserBox form button {
+  margin-top: 1.5rem;
+}
+/* Assign user style ends ------------------------ */

@@ -14,8 +14,8 @@
       </div>
       <div class="nav-menu">
         <ul>
-          <li class="active">Device List</li>
-          <li>Assign Users</li>
+          <li>Device List</li>
+          <li class="active">Assign Users</li>
           <li>
             <img src="./asset/Avatar.png" alt="profile Avatar" />
             <div class="logoutBTN">Log Out</div>
@@ -23,12 +23,28 @@
         </ul>
       </div>
     </nav>
-    <!-- main contents  -->
-    <div class="container main">
-      <h1>Welcome, <span class="user-name">Ahsan.</span></h1>
-      <div class="sutitle-light">
-        Select filters to get devices from specific location.
-      </div>
+
+    <div class="container assignUserBox">
+      <h2>Assign Device</h2>
+      <form action="#">
+        <label for="deviceID">Device ID</label>
+        <select name="deviceID" id="deviceID" required>
+          <option value="0001">0001</option>
+          <option value="0002">0002</option>
+          <option value="0003">0003</option>
+        </select>
+        <label for="location">Location</label>
+        <select name="location" id="location" required>
+          <option value="ahsan">aberdeen</option>
+          <option value="kareena">uppersahali</option>
+          <option value="behaan">north shore</option>
+        </select>
+        <label for="name">Name</label>
+        <input type="text" name="name" required />
+        <label for="phoneNumber">Phone Number</label>
+        <input type="number" name="phoneNumber" required />
+        <button>Assign</button>
+      </form>
     </div>
   </body>
 </html>

@@ -1,6 +1,7 @@
-// admin Key
+// Admin Key
 export const adminKey = "acres007";
-// signup/login ui
+
+// Signup/Login UI Elements
 export const body = document.querySelector("body");
 export const signupForm = document.getElementById("signupForm");
 export const loginForm = document.getElementById("loginForm");
@@ -11,17 +12,3 @@ export const switchViewSignup = document.querySelector(
   ".signup-form .link-text"
 );
 export const switchViewLogin = document.querySelector(".login-form .link-text");
-
-// nav bar
-
-// signup/loging display change
-
-export function signupLoginVisibility(loginVisibility) {
-  if (loginVisibility) {
-    loginFormContainer.style.display = "block";
-    signupFormContainer.style.display = "none";
-  } else {
-    signupFormContainer.style.display = "block";
-    loginFormContainer.style.display = "none";
-  }
-}

@@ -1,16 +1,7 @@
 import { signupLogin } from "./signupLogin.js";
 import { dashboard } from "./dashboard.js";
-import {
-  body,
-  signupForm,
-  createAccountBTN,
-  signupLoginVisibility,
-  switchViewLogin,
-  switchViewSignup,
-  signupFormContainer,
-  loginFormContainer,
-  loginForm,
-} from "./ui.js";
+import { setupNavbarListeners } from "./navbarListeners.js";
+import { body } from "./ui.js";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -33,68 +24,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
-// signup/login visibility toggle starts
-signupLoginVisibility(true); // Show login by default
+// Global userType variable to hold logged-in user's type
+let userType = null;
 
-switchViewSignup.addEventListener("click", () => {
-  signupLoginVisibility(false); // Show signup form
-});
-
-switchViewLogin.addEventListener("click", () => {
-  signupLoginVisibility(true); // Show login form
-});
-
-// Signup Form Submission
-signupForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const signupEmail = signupForm["signupEmail"].value.trim();
-  const signupFullName = signupForm["signupFullNameInput"].value.trim();
-  const signupPassword = signupForm["signupPassword"].value.trim();
-  const signupReWritePassword =
-    signupForm["signupReWritePassword"].value.trim();
-  const signupUserType = signupForm["signupUserType"].value.trim();
-
-  if (
-    !signupEmail ||
-    !signupFullName ||
-    !signupPassword ||
-    !signupReWritePassword ||
-    !signupUserType
-  ) {
-    alert("All fields are required.");
-    return;
-  }
-
-  if (signupPassword !== signupReWritePassword) {
-    alert("Passwords do not match!");
-    return;
-  }
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      signupEmail,
-      signupPassword
-    );
-    const user = userCredential.user;
-
-    await setDoc(doc(db, "users", user.uid), {
-      fullName: signupFullName,
-      email: signupEmail,
-      userType: signupUserType,
-    });
-
-    signupForm.reset();
-  } catch (error) {
-    console.error("Error signing up:", error);
-    alert(`Sign-up failed: ${error.message}`);
-  }
-});
-
-// Retrieve User Data by UID
+// Function to retrieve user data by UID
 async function getUserData(uid) {
   const userDocRef = doc(db, "users", uid);
   try {
@@ -106,41 +42,110 @@ async function getUserData(uid) {
   }
 }
 
-// Login Form Submission
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const email = loginForm["loginEmail"].value.trim();
-  const password = loginForm["loginPassword"].value.trim();
+// Function to render the dashboard and set up navbar click listeners
+function loadDashboard(userData) {
+  userType = userData.userType;
+  dashboard(body, userData.fullName.split(" ")[0]); // Render dashboard with user's first name
+  setupNavbarListeners(userData); // Set up navbar listeners for the dashboard
+}
 
-  if (!email || !password) {
-    alert("Please enter both email and password.");
-    return;
+// Function to set up event listeners for signup and login forms
+function setupEventListeners() {
+  const signupForm = document.getElementById("signupForm");
+  const loginForm = document.getElementById("loginForm");
+
+  // Signup Form Submission
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const signupEmail = signupForm["signupEmail"].value.trim();
+      const signupFullName = signupForm["signupFullNameInput"].value.trim();
+      const signupPassword = signupForm["signupPassword"].value.trim();
+      const signupReWritePassword =
+        signupForm["signupReWritePassword"].value.trim();
+      const signupUserType = signupForm["signupUserType"].value.trim();
+
+      if (
+        !signupEmail ||
+        !signupFullName ||
+        !signupPassword ||
+        !signupReWritePassword ||
+        !signupUserType
+      ) {
+        alert("All fields are required.");
+        return;
+      }
+
+      if (signupPassword !== signupReWritePassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          signupEmail,
+          signupPassword
+        );
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          fullName: signupFullName,
+          email: signupEmail,
+          userType: signupUserType,
+        });
+
+        userType = signupUserType;
+
+        loadDashboard({ fullName: signupFullName, userType: signupUserType });
+        signupForm.reset();
+      } catch (error) {
+        console.error("Error signing up:", error);
+        alert(`Sign-up failed: ${error.message}`);
+      }
+    });
   }
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log("User logged in:", user);
-    })
-    .catch((error) => {
-      console.error("Error logging in:", error);
-      alert(`Login failed: ${error.message}`);
+  // Login Form Submission
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = loginForm["loginEmail"].value.trim();
+      const password = loginForm["loginPassword"].value.trim();
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          getUserData(user.uid).then((userData) => {
+            if (userData) {
+              loadDashboard(userData);
+            }
+          });
+        })
+        .catch((error) => {
+          console.error("Error logging in:", error);
+          alert(`Login failed: ${error.message}`);
+        });
     });
-});
+  }
+}
 
 // Handle Auth State Changes
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("User logged in");
-
     getUserData(user.uid).then((userData) => {
       if (userData) {
-        console.log("Retrieved user data:", userData.fullName);
-        dashboard(body, userData.fullName.split(" ")[0]);
+        loadDashboard(userData);
       }
     });
   } else {
-    console.log("No user is logged in.");
+    signupLogin(body);
+    setupEventListeners();
   }
 });
 
@@ -149,8 +154,8 @@ document.body.addEventListener("click", (event) => {
   if (event.target.classList.contains("logoutBTN")) {
     signOut(auth)
       .then(() => {
-        console.log("User logged out.");
         signupLogin(body);
+        setupEventListeners();
       })
       .catch((error) => {
         console.error("Error logging out:", error);
