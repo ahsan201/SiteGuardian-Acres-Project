@@ -1,14 +1,29 @@
 import { db } from "./index.js";
-import { getDocs, collection, query, where } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  query,
+  where,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { setupNavbarListeners } from "./navbarListeners.js";
 
 export async function assignUser(element, userType) {
-  console.log("Assigning user form for userType:", userType); // Debug log for userType
-
+  let deviceOptions = "";
   let managerOptions = "";
 
-  // Only fetch managers if userType is "admin"
   if (userType === "admin") {
+    const devicesRef = collection(db, "device");
+    const devicesSnapshot = await getDocs(devicesRef);
+
+    deviceOptions = devicesSnapshot.docs
+      .map((doc) => {
+        const deviceId = doc.id;
+        return `<option value="${deviceId}">${deviceId}</option>`;
+      })
+      .join("");
+
     const usersRef = collection(db, "users");
     const managerQuery = query(usersRef, where("userType", "==", "manager"));
     const managerSnapshot = await getDocs(managerQuery);
@@ -18,44 +33,25 @@ export async function assignUser(element, userType) {
         const managerName = doc.data().fullName;
         return `<option value="${managerName}">${managerName}</option>`;
       })
-      .join(""); // Join all option elements into a single string
+      .join("");
   }
 
-  // Define form content based on userType
+  // Define form content
   const formContent =
     userType === "admin"
       ? `
       <label for="deviceID">Device ID</label>
       <select name="deviceID" id="deviceID" required>
-        <option value="0001">0001</option>
-        <option value="0002">0002</option>
-        <option value="0003">0003</option>
+        ${deviceOptions}
       </select>
       <label for="managerName">Manager Name</label>
       <select name="managerName" id="managerName" required>
-        ${managerOptions} <!-- Populated manager options here -->
+        ${managerOptions}
       </select>
+      <button type="submit" id="assignButton">Assign</button>
     `
-      : `
-      <label for="deviceID">Device ID</label>
-      <select name="deviceID" id="deviceID" required>
-        <option value="0001">0001</option>
-        <option value="0002">0002</option>
-        <option value="0003">0003</option>
-      </select>
-      <label for="location">Location</label>
-      <select name="location" id="location" required>
-        <option value="aberdeen">Aberdeen</option>
-        <option value="uppersahali">Upper Sahali</option>
-        <option value="northshore">North Shore</option>
-      </select>
-      <label for="name">Name</label>
-      <input type="text" name="name" required />
-      <label for="phoneNumber">Phone Number</label>
-      <input type="number" name="phoneNumber" required />
-    `;
+      : `<!-- Other form content for non-admin users, if applicable -->`;
 
-  // Set the inner HTML for the assignUser view
   element.innerHTML = `
     <nav class="drop-shadow1">
       <div class="nav-logo">
@@ -76,13 +72,33 @@ export async function assignUser(element, userType) {
 
     <div class="container assignUserBox">
       <h2>Assign ${userType === "admin" ? "Manager" : "Device"}</h2>
-      <form action="#">
+      <form id="assignForm">
         ${formContent}
-        <button>Assign</button>
       </form>
     </div>
   `;
 
-  // Reapply navbar listeners after rendering "Assign Users"
+  // Add event listener for the form submission
+  const assignForm = document.getElementById("assignForm");
+  assignForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const selectedDeviceId = document.getElementById("deviceID").value;
+    const selectedManagerName = document.getElementById("managerName").value;
+
+    if (selectedDeviceId && selectedManagerName) {
+      try {
+        const deviceRef = doc(db, "device", selectedDeviceId);
+        await updateDoc(deviceRef, {
+          managerName: selectedManagerName,
+        });
+        alert(`Manager assigned successfully to device ${selectedDeviceId}`);
+      } catch (error) {
+        console.error("Error updating manager:", error);
+        alert("Failed to assign manager. Please try again.");
+      }
+    }
+  });
+
   setupNavbarListeners({ fullName: "User", userType });
 }
