@@ -238,17 +238,75 @@ select {
 }
 /* signup/login style ends ----------------------- */
 /* Assign user style starts ------------------------ */
-.assignUserBox {
-  margin-top: 4rem;
+/* Table container styling */
+.tableContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
-.assignUserBox form {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  max-width: 300px;
-  gap: 0.5rem;
+
+/* Basic table styling */
+#deviceTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "WorkSans";
+  font-size: 16px;
+  margin-top: 20px;
+  border-radius: 1rem;
+  overflow: hidden;
 }
-.assignUserBox form button {
-  margin-top: 1.5rem;
+
+/* Header styling */
+#deviceTable thead th {
+  background-color: var(--cf-White);
+  color: var(--cf-Dark);
+  font-weight: bold;
+  padding: 12px 15px;
+  border-bottom: 2px solid var(--cf-Gray);
+  text-align: center;
 }
-/* Assign user style ends ------------------------ */
+
+/* Row styling */
+#deviceTable tbody tr {
+  background-color: var(--cf-White);
+  transition: background-color 0.2s ease;
+}
+
+/* Inactive row styling */
+#deviceTable tbody tr:not(:has(#deviceActive)) {
+  color: var(--cf-Gray);
+}
+
+/* Cell padding and border */
+#deviceTable td,
+#deviceTable th {
+  padding: 12px 15px;
+  border-bottom: 1px solid #d0d4d9;
+  text-align: center;
+}
+
+/* Active status cell styling */
+#deviceTable #deviceActive span {
+  color: var(--cf-Dark);
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background-color: var(--cf-Success);
+  border-radius: 3rem;
+}
+
+/* Inactive status cell styling */
+#deviceTable td:not(#deviceActive) span {
+  color: var(--cf-Dark);
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background-color: var(--cf-Gray);
+  border-radius: 3rem;
+}
+
+/* Hover effect for table rows */
+#deviceTable tbody tr:hover {
+  background-color: rgb(240, 255, 255);
+  cursor: pointer;
+}
+
+/* Table design ends -------------------------------- */
