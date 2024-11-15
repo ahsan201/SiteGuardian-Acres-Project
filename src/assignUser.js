@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { setupNavbarListeners } from "./navbarListeners.js";
 
-export async function assignUser(element, userType) {
+export async function assignUser(element, userType, userData) {
   let deviceOptions = "";
   let locationOptions = "";
   let managerOptions = "";
@@ -154,5 +154,5 @@ export async function assignUser(element, userType) {
     }
   });
 
-  setupNavbarListeners({ fullName: "User", userType });
+  setupNavbarListeners(userData);
 }
