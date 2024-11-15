@@ -10,10 +10,7 @@ export function setupNavbarListeners(userData) {
 
   if (deviceListNavItem) {
     deviceListNavItem.addEventListener("click", () => {
-      dashboard(
-        document.getElementById("content-container"),
-        userData.fullName.split(" ")[0]
-      );
+      dashboard(document.getElementById("content-container"), userData);
     });
   }
 

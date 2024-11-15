@@ -47,7 +47,7 @@ function loadDashboard(userData) {
   userType = userData.userType;
   const contentContainer = document.getElementById("content-container");
   if (contentContainer) {
-    dashboard(contentContainer, userData.fullName.split(" ")[0]);
+    dashboard(contentContainer, userData);
     setupNavbarListeners(userData);
   } else {
     console.error("Content container not found; cannot render dashboard.");
