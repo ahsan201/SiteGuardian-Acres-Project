@@ -22,10 +22,7 @@ export async function assignUser(element, userType) {
     const devicesSnapshot = await getDocs(devicesRef);
 
     deviceOptions = devicesSnapshot.docs
-      .map((doc) => {
-        const deviceId = doc.id;
-        return `<option value="${deviceId}">${deviceId}</option>`;
-      })
+      .map((doc) => `<option value="${doc.id}">${doc.id}</option>`)
       .join("");
 
     // Query all managers for the dropdown and map their names to UIDs
@@ -52,10 +49,7 @@ export async function assignUser(element, userType) {
     const devicesSnapshot = await getDocs(deviceQuery);
 
     deviceOptions = devicesSnapshot.docs
-      .map((doc) => {
-        const deviceId = doc.id;
-        return `<option value="${deviceId}">${deviceId}</option>`;
-      })
+      .map((doc) => `<option value="${doc.id}">${doc.id}</option>`)
       .join("");
   }
 
@@ -74,51 +68,34 @@ export async function assignUser(element, userType) {
   const formContent =
     userType === "admin"
       ? `
-      <label for="deviceID">Device ID</label>
-      <select name="deviceID" id="deviceID" required>
-        ${deviceOptions}
-      </select>
-      <label for="managerName">Manager Name</label>
-      <select name="managerName" id="managerName" required>
-        ${managerOptions}
-      </select>
-      <button type="submit" id="assignButton">Assign</button>
-    `
+        <label for="deviceID">Device ID</label>
+        <select name="deviceID" id="deviceID" required>
+          ${deviceOptions}
+        </select>
+        <label for="managerName">Manager Name</label>
+        <select name="managerName" id="managerName" required>
+          ${managerOptions}
+        </select>
+        <button type="submit" id="assignButton">Assign</button>
+      `
       : `
-      <label for="deviceID">Device ID</label>
-      <select name="deviceID" id="deviceID" required>
-        ${deviceOptions}
-      </select>
-      <label for="location">Location</label>
-      <select name="location" id="location" required>
-        ${locationOptions}
-      </select>
-      <label for="name">Name</label>
-      <input type="text" name="name" required />
-      <label for="phoneNumber">Phone Number</label>
-      <input type="number" name="phoneNumber" required />
-      <button type="submit" id="assignButton">Assign</button>
-    `;
+        <label for="deviceID">Device ID</label>
+        <select name="deviceID" id="deviceID" required>
+          ${deviceOptions}
+        </select>
+        <label for="location">Location</label>
+        <select name="location" id="location" required>
+          ${locationOptions}
+        </select>
+        <label for="name">Name</label>
+        <input type="text" name="name" required />
+        <label for="phoneNumber">Phone Number</label>
+        <input type="number" name="phoneNumber" required />
+        <button type="submit" id="assignButton">Assign</button>
+      `;
 
   // Set the inner HTML for the assignUser view
   element.innerHTML = `
-    <nav class="drop-shadow1">
-      <div class="nav-logo">
-        <img src="./asset/siteguardian logo.png" alt="siteguardian logo" />
-        <div>SiteGuardian</div>
-      </div>
-      <div class="nav-menu">
-        <ul>
-          <li>Device List</li>
-          <li class="active">Assign Users</li>
-          <li>
-            <img src="./asset/Avatar.png" alt="profile Avatar" />
-            <div class="logoutBTN">Log Out</div>
-          </li>
-        </ul>
-      </div>
-    </nav>
-
     <div class="container assignUserBox">
       <h2>Assign ${userType === "admin" ? "Manager" : "Device"}</h2>
       <form id="assignForm">

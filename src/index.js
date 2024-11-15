@@ -1,7 +1,7 @@
 import { signupLogin } from "./signupLogin.js";
 import { dashboard } from "./dashboard.js";
 import { setupNavbarListeners } from "./navbarListeners.js";
-import { body } from "./ui.js";
+import { renderNavbar } from "./navBar.js";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -27,7 +27,7 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// Global userType variable to hold logged-in user's type
+// Global variable to hold logged-in user's type
 let userType = null;
 
 // Function to retrieve user data by UID
@@ -45,107 +45,140 @@ async function getUserData(uid) {
 // Function to render the dashboard and set up navbar click listeners
 function loadDashboard(userData) {
   userType = userData.userType;
-  dashboard(body, userData.fullName.split(" ")[0]); // Render dashboard with user's first name
-  setupNavbarListeners(userData); // Set up navbar listeners for the dashboard
+  const contentContainer = document.getElementById("content-container");
+  if (contentContainer) {
+    dashboard(contentContainer, userData.fullName.split(" ")[0]);
+    setupNavbarListeners(userData);
+  } else {
+    console.error("Content container not found; cannot render dashboard.");
+  }
 }
 
-// Function to set up event listeners for signup and login forms
-function setupEventListeners() {
-  const signupForm = document.getElementById("signupForm");
-  const loginForm = document.getElementById("loginForm");
+// Function to handle signup form submission
+async function handleSignup(event) {
+  event.preventDefault();
+  const signupForm = event.target;
+  const signupEmail = signupForm["signupEmail"].value.trim();
+  const signupFullName = signupForm["signupFullNameInput"].value.trim();
+  const signupPassword = signupForm["signupPassword"].value.trim();
+  const signupReWritePassword =
+    signupForm["signupReWritePassword"].value.trim();
+  const signupUserType = signupForm["signupUserType"].value.trim();
 
-  // Signup Form Submission
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const signupEmail = signupForm["signupEmail"].value.trim();
-      const signupFullName = signupForm["signupFullNameInput"].value.trim();
-      const signupPassword = signupForm["signupPassword"].value.trim();
-      const signupReWritePassword =
-        signupForm["signupReWritePassword"].value.trim();
-      const signupUserType = signupForm["signupUserType"].value.trim();
-
-      if (
-        !signupEmail ||
-        !signupFullName ||
-        !signupPassword ||
-        !signupReWritePassword ||
-        !signupUserType
-      ) {
-        alert("All fields are required.");
-        return;
-      }
-
-      if (signupPassword !== signupReWritePassword) {
-        alert("Passwords do not match!");
-        return;
-      }
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          signupEmail,
-          signupPassword
-        );
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
-          fullName: signupFullName,
-          email: signupEmail,
-          userType: signupUserType,
-        });
-
-        userType = signupUserType;
-
-        loadDashboard({ fullName: signupFullName, userType: signupUserType });
-        signupForm.reset();
-      } catch (error) {
-        console.error("Error signing up:", error);
-        alert(`Sign-up failed: ${error.message}`);
-      }
-    });
+  if (
+    !signupEmail ||
+    !signupFullName ||
+    !signupPassword ||
+    !signupReWritePassword ||
+    !signupUserType
+  ) {
+    alert("All fields are required.");
+    return;
   }
 
-  // Login Form Submission
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = loginForm["loginEmail"].value.trim();
-      const password = loginForm["loginPassword"].value.trim();
+  if (signupPassword !== signupReWritePassword) {
+    alert("Passwords do not match!");
+    return;
+  }
 
-      if (!email || !password) {
-        alert("Please enter both email and password.");
-        return;
-      }
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      signupEmail,
+      signupPassword
+    );
+    const user = userCredential.user;
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          getUserData(user.uid).then((userData) => {
-            if (userData) {
-              loadDashboard(userData);
-            }
-          });
-        })
-        .catch((error) => {
-          console.error("Error logging in:", error);
-          alert(`Login failed: ${error.message}`);
-        });
+    await setDoc(doc(db, "users", user.uid), {
+      fullName: signupFullName,
+      email: signupEmail,
+      userType: signupUserType,
     });
+
+    userType = signupUserType;
+
+    loadDashboard({ fullName: signupFullName, userType: signupUserType });
+    signupForm.reset();
+  } catch (error) {
+    console.error("Error signing up:", error);
+    alert(`Sign-up failed: ${error.message}`);
+  }
+}
+
+// Function to handle login form submission
+async function handleLogin(event) {
+  event.preventDefault();
+  const loginForm = event.target;
+  const email = loginForm["loginEmail"].value.trim();
+  const password = loginForm["loginPassword"].value.trim();
+
+  if (!email || !password) {
+    alert("Please enter both email and password.");
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+    const userData = await getUserData(user.uid);
+
+    if (userData) {
+      const navbarContainer = document.getElementById("navbar-container");
+      if (navbarContainer) {
+        renderNavbar(navbarContainer);
+      } else {
+        console.error("Navbar container not found.");
+      }
+      loadDashboard(userData);
+    }
+  } catch (error) {
+    console.error("Error logging in:", error);
+    alert(`Login failed: ${error.message}`);
   }
 }
 
 // Handle Auth State Changes
 onAuthStateChanged(auth, (user) => {
+  const navbarContainer = document.getElementById("navbar-container");
+  const contentContainer = document.getElementById("content-container");
+
   if (user) {
+    if (navbarContainer) {
+      renderNavbar(navbarContainer);
+    } else {
+      console.error("Navbar container not found.");
+    }
     getUserData(user.uid).then((userData) => {
       if (userData) {
         loadDashboard(userData);
       }
     });
   } else {
-    signupLogin(body);
-    setupEventListeners();
+    if (navbarContainer) {
+      navbarContainer.innerHTML = "";
+    }
+    if (contentContainer) {
+      const { signupForm, loginForm } = signupLogin(contentContainer);
+
+      // Add form submission event listeners if forms exist
+      if (signupForm) {
+        signupForm.addEventListener("submit", handleSignup);
+      } else {
+        console.error("Signup form not found in the DOM.");
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener("submit", handleLogin);
+      } else {
+        console.error("Login form not found in the DOM.");
+      }
+    } else {
+      console.error("Content container not found for login/signup rendering.");
+    }
   }
 });
 
@@ -154,8 +187,22 @@ document.body.addEventListener("click", (event) => {
   if (event.target.classList.contains("logoutBTN")) {
     signOut(auth)
       .then(() => {
-        signupLogin(body);
-        setupEventListeners();
+        const navbarContainer = document.getElementById("navbar-container");
+        if (navbarContainer) {
+          navbarContainer.innerHTML = "";
+        }
+        const contentContainer = document.getElementById("content-container");
+        if (contentContainer) {
+          const { signupForm, loginForm } = signupLogin(contentContainer);
+
+          if (signupForm) {
+            signupForm.addEventListener("submit", handleSignup);
+          }
+
+          if (loginForm) {
+            loginForm.addEventListener("submit", handleLogin);
+          }
+        }
       })
       .catch((error) => {
         console.error("Error logging out:", error);
