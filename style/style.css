@@ -310,3 +310,87 @@ select {
 }
 
 /* Table design ends -------------------------------- */
+/* Device Information Popup Starts --------------------------------- */
+.main {
+  position: relative;
+}
+.deviceInfoOutterContainer {
+  width: 100%;
+  height: 100%;
+  background: rgba(247, 250, 255, 0.01);
+  /* background-color: red; */
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-content: center;
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 0;
+}
+.deviceInfoOutterContainer label {
+  color: var(--cf-Gray);
+  font-size: 0.9rem;
+}
+.deviceInfoContainer {
+  max-width: 600px;
+  background-color: var(--cf-White);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0px 4px 27.3px 1px rgba(0, 0, 0, 0.25);
+}
+.deviceInfoContainer > div:not(#alarmHistory) {
+  display: flex;
+  gap: 4rem;
+  margin: 1rem 0rem;
+}
+.deviceInfoContainer h2,
+h3 {
+  margin-bottom: 1rem;
+}
+
+#manager {
+  background-color: var(--cf-Manager-Label);
+  padding: 0.5rem 1rem;
+  max-width: min-content;
+  border-radius: 3rem;
+  margin: 0.5rem 0rem;
+}
+#location {
+  background-color: var(--cf-Location-Label);
+  padding: 0.5rem 1rem;
+  max-width: min-content;
+  border-radius: 3rem;
+  margin: 0.5rem 0rem;
+  white-space: nowrap;
+}
+#status {
+  background-color: var(--cf-Success);
+  padding: 0.5rem 1rem;
+  max-width: min-content;
+  border-radius: 3rem;
+  margin: 0.5rem 0rem;
+  white-space: nowrap;
+}
+
+#alarmInfo {
+  border-bottom: 1px solid var(--cf-Gray);
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+#alarmName {
+  display: flex;
+  align-content: center;
+}
+#alarmHistory {
+  max-height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+/* Device Information Popup Ends --------------------------------- */
