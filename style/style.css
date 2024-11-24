@@ -394,3 +394,27 @@ h3 {
 }
 
 /* Device Information Popup Ends --------------------------------- */
+
+/* Active Alarm Device Trigger Starts --------------------------------- */
+.activeAlarmDeviceInfoOutterContainer {
+  width: 100%;
+  height: 100%;
+  background: rgba(247, 250, 255, 0.01);
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-content: center;
+  position: absolute;
+  /* display: none; */
+  top: 0;
+  left: 0;
+}
+.activeAlarmDeviceInfoOutterContainer .deviceInfoContainer {
+  max-width: 100%;
+  background-color: red;
+  color: white;
+}
+
+.activeAlarmDeviceInfoOutterContainer h1 {
+  margin: 1rem 0rem;
+}
+/* Active Alarm Device Trigger Ends --------------------------------- */

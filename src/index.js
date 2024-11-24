@@ -11,6 +11,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { monitorAlarmUpdates } from "./alarmHandler.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -209,3 +210,6 @@ document.body.addEventListener("click", (event) => {
       });
   }
 });
+
+// Start monitoring alarms
+monitorAlarmUpdates();
