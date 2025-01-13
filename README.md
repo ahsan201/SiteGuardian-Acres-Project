@@ -107,7 +107,7 @@ Thanks to the following people who have contributed to this project:
 
 If you want to contact us, you can reach out at:
 
-- **Email**: your_email@address.com
+- **Email**: niloy.ahsan02@gmail.com
 - **Twitter**: [@ahsan_habib_1](https://x.com/ahsan_habib_1)
 
 ---
